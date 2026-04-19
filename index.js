@@ -16,7 +16,17 @@ app.post("/wompi/webhook", async (req, res) => {
     const transaction = event.data.transaction;
 
     if (transaction.status === "APPROVED") {
-      const orderId = transaction.reference;
+  const email = transaction.customer_email;
+  const amount = transaction.amount_in_cents / 100;
+
+  const order = await buscarPedido(email, amount);
+
+  if (!order) {
+    console.log("❌ No se encontró pedido");
+    return;
+  }
+
+  const orderId = order.id;
 
       try {
         await axios.post(
@@ -48,3 +58,24 @@ app.post("/wompi/webhook", async (req, res) => {
 });
 
 app.listen(3000, () => console.log("Servidor listo"));
+async function buscarPedido(email, amount) {
+  const SHOP = "TU-TIENDA.myshopify.com";
+  const TOKEN = "TU_ACCESS_TOKEN";
+
+  const response = await axios.get(
+    `https://${SHOP}/admin/api/2024-01/orders.json?status=open`,
+    {
+      headers: {
+        "X-Shopify-Access-Token": TOKEN
+      }
+    }
+  );
+
+  const orders = response.data.orders;
+
+  return orders.find(order =>
+    order.email === email &&
+    parseFloat(order.total_price) === amount &&
+    order.financial_status === "pending"
+  );
+}
