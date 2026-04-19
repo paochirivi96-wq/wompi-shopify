@@ -109,3 +109,5 @@ app.get("/auth/callback", async (req, res) => {
 
 
 app.listen(3000, () => console.log("Servidor listo"));
+
+console.log("CLIENT_ID:", process.env.SHOPIFY_CLIENT_ID);
