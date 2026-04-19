@@ -5,8 +5,8 @@ const app = express();
 app.use(express.json());
 
 
-const SHOPIFY_STORE = "trento-8304.myshopify.com";
-const SHOPIFY_TOKEN = "TU_TOKEN_AQUI";
+const SHOPIFY_STORE = process.env.SHOPIFY_STORE;
+const SHOPIFY_TOKEN = process.env.SHOPIFY_ACCESS_TOKEN;
 
 app.post("/wompi/webhook", async (req, res) => {
   const event = req.body;
